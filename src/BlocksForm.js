@@ -1,10 +1,39 @@
 import React, { Component } from "react";
+import { css } from 'emotion'
 
-const BlockInput = ({ letter }) => (
-  <div>
+const NumberInput = ({ id, defaultValue }) => (
+  <input
+    id={id}
+    type="number"
+    min="0"
+    defaultValue={defaultValue}
+    className={css`
+      width: 3em;
+      font-size: 2em;
+    `
+    }
+  />
+)
+
+
+const BlockInput = ({ letter, defaultValue }) => (
+  <div
+    className={css`
+      display: inline-block;
+      margin: 2em;
+    `
+    }
+  >
     <label>
-      <img src={`images/${letter}.png`} className="tetraminoIcon" alt={`${letter.toUpperCase()} Blocks`} />
-      <input id={`${letter}blocks`} type="number" min="0" value="1" />
+      <img
+        src={`images/${letter}.png`}
+        className="tetraminoIcon"
+        alt={`${letter.toUpperCase()} Blocks`}
+      />
+      <NumberInput
+        id={`${letter}blocks`}
+        defaultValue={defaultValue}
+      />
     </label>
   </div>
 );
@@ -18,25 +47,27 @@ class BlocksForm extends Component {
             <div>
               Size:
               <label>
-                <input id="rows" type="number" min="1" value="6" />
+                <NumberInput id="rows" defaultValue={6} />
                 {" "}
                 Rows,
               </label>
               {" "}
               <label>
-                <input id="cols" type="number" min="1" value="8" />
+                <NumberInput id="cols" defaultValue={8} />
                 {" "}
                 Columns
               </label>
             </div>
           </div>
-          <BlockInput letter="i" />
-          <BlockInput letter="o" />
-          <BlockInput letter="t" />
-          <BlockInput letter="j" />
-          <BlockInput letter="l" />
-          <BlockInput letter="s" />
-          <BlockInput letter="z" />
+          <BlockInput letter="i" defaultValue={1} />
+          <BlockInput letter="o" defaultValue={5} />
+          <BlockInput letter="t" defaultValue={2} />
+          <br />
+          <BlockInput letter="j" defaultValue={0} />
+          <BlockInput letter="l" defaultValue={1} />
+          <br />
+          <BlockInput letter="s" defaultValue={2} />
+          <BlockInput letter="z" defaultValue={1} />
         </div>
         <input type="submit" id="start" value="Solve" />
       </form>

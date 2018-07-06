@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import "./App.css";
 import Solution from "./Solution";
 import BlocksForm from "./BlocksForm";
+import { css } from 'emotion'
 
 const getState = () => {
   const rows = Number(document.getElementById("rows").value),
@@ -74,18 +75,31 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
+      <div className={css`
+            color: White;
+            background-color: black;
+            text-align: center;
+            height: 100%;
+        `
+        }
+      >
         <header className="App-heade">
           <h1 className="App-title">Tetris Puzzle Solver</h1>
         </header>
-        <p>
-          Fills a rectangle with tetraminos.<br />Requires HTML5 Canvas and Web
-          Workers support.
-        </p>
-        {this.state.solution && (
-          <Solution params={this.state.params} nPieces={this.state.nPieces} />
-        )}
-        {this.state.solution || <BlocksForm onSolve={this.solve} />}
+        <div
+          className={css`
+            `
+          }
+          >
+          <p>
+            Fills a rectangle with tetraminos.<br />Requires HTML5 Canvas and Web
+            Workers support.
+          </p>
+          {this.state.solution && (
+            <Solution params={this.state.params} nPieces={this.state.nPieces} />
+          )}
+          {this.state.solution || <BlocksForm onSolve={this.solve} />}
+        </div>
       </div>
     );
   }
