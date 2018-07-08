@@ -19,59 +19,61 @@ const I = "i",
 let blocks;
 let blocksPtr = 0;
 
-this.addEventListener(
-  "message",
-  function(e) {
-    var params = e.data.split(" ");
+const solve = (e) => {
+  var params = e.data.split(" ");
 
-    if (params[0].indexOf("s") === 0) {
-      let i;
-      rows = Number(params[1]);
-      cols = Number(params[2]);
-      iblocks = Number(params[3]);
-      oblocks = Number(params[4]);
-      tblocks = Number(params[5]);
-      jblocks = Number(params[6]);
-      lblocks = Number(params[7]);
-      sblocks = Number(params[8]);
-      zblocks = Number(params[9]);
-      nPieces =
-        iblocks + oblocks + tblocks + jblocks + lblocks + sblocks + zblocks;
-      blocks = new Array(nPieces);
-      for (i = 0; i < iblocks; i++) {
-        blocks[blocksPtr++] = I;
-      }
-      for (i = 0; i < oblocks; i++) {
-        blocks[blocksPtr++] = O;
-      }
-      for (i = 0; i < tblocks; i++) {
-        blocks[blocksPtr++] = T;
-      }
-      for (i = 0; i < jblocks; i++) {
-        blocks[blocksPtr++] = J;
-      }
-      for (i = 0; i < lblocks; i++) {
-        blocks[blocksPtr++] = L;
-      }
-      for (i = 0; i < sblocks; i++) {
-        blocks[blocksPtr++] = S;
-      }
-      for (i = 0; i < zblocks; i++) {
-        blocks[blocksPtr++] = Z;
-      }
-      blocksPtr = 0;
-
-      board = new Array(rows);
-      for (var y = 0; y < board.length; y++) {
-        board[y] = new Array(cols);
-        for (var x = 0; x < board[0].length; x++) board[y][x] = 0;
-      }
-
-      solve();
+  if (params[0].indexOf("s") === 0) {
+    let i;
+    rows = Number(params[1]);
+    cols = Number(params[2]);
+    iblocks = Number(params[3]);
+    oblocks = Number(params[4]);
+    tblocks = Number(params[5]);
+    jblocks = Number(params[6]);
+    lblocks = Number(params[7]);
+    sblocks = Number(params[8]);
+    zblocks = Number(params[9]);
+    nPieces =
+      iblocks + oblocks + tblocks + jblocks + lblocks + sblocks + zblocks;
+    blocks = new Array(nPieces);
+    for (i = 0; i < iblocks; i++) {
+      blocks[blocksPtr++] = I;
     }
-  },
-  false
-);
+    for (i = 0; i < oblocks; i++) {
+      blocks[blocksPtr++] = O;
+    }
+    for (i = 0; i < tblocks; i++) {
+      blocks[blocksPtr++] = T;
+    }
+    for (i = 0; i < jblocks; i++) {
+      blocks[blocksPtr++] = J;
+    }
+    for (i = 0; i < lblocks; i++) {
+      blocks[blocksPtr++] = L;
+    }
+    for (i = 0; i < sblocks; i++) {
+      blocks[blocksPtr++] = S;
+    }
+    for (i = 0; i < zblocks; i++) {
+      blocks[blocksPtr++] = Z;
+    }
+    blocksPtr = 0;
+
+    board = new Array(rows);
+    for (var y = 0; y < board.length; y++) {
+      board[y] = new Array(cols);
+      for (var x = 0; x < board[0].length; x++) board[y][x] = 0;
+    }
+
+    // old solve()
+    if (nPieces * 4 !== rows * cols) postMessage("impossible");
+    else if (s(1)) {
+      //cannot be filled by tetraminos
+      sendBoard();
+      postMessage("solved");
+    } else postMessage("impossible");
+  }
+}
 
 function sendBoard() {
   if (board) {
@@ -83,14 +85,6 @@ function sendBoard() {
 }
 
 var t = Date.now();
-function solve() {
-  if (nPieces * 4 !== rows * cols) postMessage("impossible");
-  else if (s(1)) {
-    //cannot be filled by tetraminos
-    sendBoard();
-    postMessage("solved");
-  } else postMessage("impossible");
-}
 
 function group(y, x) {
   if (y >= 0 && y < rows && x >= 0 && x < cols && board[y][x] === 0) {
@@ -728,3 +722,5 @@ function s(p) {
     return false; //0=couldn't find a place for this block
   }
 }
+
+export default solve;
