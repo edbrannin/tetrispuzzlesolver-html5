@@ -1,14 +1,3 @@
-let board;
-let rows,
-  cols,
-  iblocks,
-  oblocks,
-  tblocks,
-  jblocks,
-  lblocks,
-  sblocks,
-  zblocks,
-  nPieces;
 const I = "i",
   O = "o",
   T = "t",
@@ -16,711 +5,714 @@ const I = "i",
   L = "l",
   S = "s",
   Z = "z";
-let blocks;
-let blocksPtr = 0;
 
-const solve = (e) => {
-  var params = e.data.split(" ");
-
-  if (params[0].indexOf("s") === 0) {
-    let i;
-    rows = Number(params[1]);
-    cols = Number(params[2]);
-    iblocks = Number(params[3]);
-    oblocks = Number(params[4]);
-    tblocks = Number(params[5]);
-    jblocks = Number(params[6]);
-    lblocks = Number(params[7]);
-    sblocks = Number(params[8]);
-    zblocks = Number(params[9]);
-    nPieces =
+class Solver {
+  constructor({
+    rows,
+    cols,
+    iblocks,
+    oblocks,
+    tblocks,
+    jblocks,
+    lblocks,
+    sblocks,
+    zblocks,
+  }) {
+    this.blocksPtr = 0;
+    this.rows = this.rows;
+    this.cols = this.cols;
+    this.nPieces =
       iblocks + oblocks + tblocks + jblocks + lblocks + sblocks + zblocks;
-    blocks = new Array(nPieces);
+    this.t = Date.now();
+    let i;
+    this.blocks = new Array(this.nPieces);
     for (i = 0; i < iblocks; i++) {
-      blocks[blocksPtr++] = I;
+      this.blocks[this.blocksPtr++] = I;
     }
     for (i = 0; i < oblocks; i++) {
-      blocks[blocksPtr++] = O;
+      this.blocks[this.blocksPtr++] = O;
     }
     for (i = 0; i < tblocks; i++) {
-      blocks[blocksPtr++] = T;
+      this.blocks[this.blocksPtr++] = T;
     }
     for (i = 0; i < jblocks; i++) {
-      blocks[blocksPtr++] = J;
+      this.blocks[this.blocksPtr++] = J;
     }
     for (i = 0; i < lblocks; i++) {
-      blocks[blocksPtr++] = L;
+      this.blocks[this.blocksPtr++] = L;
     }
     for (i = 0; i < sblocks; i++) {
-      blocks[blocksPtr++] = S;
+      this.blocks[this.blocksPtr++] = S;
     }
     for (i = 0; i < zblocks; i++) {
-      blocks[blocksPtr++] = Z;
+      this.blocks[this.blocksPtr++] = Z;
     }
-    blocksPtr = 0;
+    this.blocksPtr = 0;
 
-    board = new Array(rows);
-    for (var y = 0; y < board.length; y++) {
-      board[y] = new Array(cols);
-      for (var x = 0; x < board[0].length; x++) board[y][x] = 0;
+    this.board = new Array(this.rows);
+    for (var y = 0; y < this.board.length; y++) {
+      this.board[y] = new Array(this.cols);
+      for (var x = 0; x < this.board[0].length; x++) this.board[y][x] = 0;
     }
+  }
 
+  solve() {
     // old solve()
-    if (nPieces * 4 !== rows * cols) postMessage("impossible");
-    else if (s(1)) {
+    if (this.nPieces * 4 !== this.rows * this.cols) postMessage("impossible");
+    else if (this.s(1)) {
       //cannot be filled by tetraminos
-      sendBoard();
+      this.sendBoard();
       postMessage("solved");
     } else postMessage("impossible");
   }
-}
 
-function sendBoard() {
-  if (board) {
-    var s = "grid " + board.length + " " + board[0].length + " ";
-    for (var y = 0; y < board.length; y++)
-      for (var x = 0; x < board[0].length; x++) s += board[y][x] + " ";
-    postMessage(s);
-  }
-}
-
-var t = Date.now();
-
-function group(y, x) {
-  if (y >= 0 && y < rows && x >= 0 && x < cols && board[y][x] === 0) {
-    board[y][x] = -1;
-    return (
-      1 + group(y, x + 1) + group(y, x - 1) + group(y + 1, x) + group(y - 1, x)
-    );
-  }
-  return 0;
-}
-
-function clearGroups() {
-  for (var y = 0; y < rows; y++) {
-    for (var x = 0; x < cols; x++) {
-      if (board[y][x] === -1) {
-        board[y][x] = 0;
-      }
+  sendBoard() {
+    if (this.board) {
+      var s = "grid " + this.board.length + " " + this.board[0].length + " ";
+      for (var y = 0; y < this.board.length; y++)
+        for (var x = 0; x < this.board[0].length; x++) s += this.board[y][x] + " ";
+      postMessage(s);
     }
   }
-}
 
-function isStupidConfig() {
-  for (var y = 0; y < rows; y++) {
-    for (var x = 0; x < cols; x++) {
-      if (board[y][x] === 0) {
-        if (group(y, x) % 4 !== 0) {
-          clearGroups();
-          return true; //cannot be filled by tetraminos, stupid config
+  group(y, x) {
+    if (y >= 0 && y < this.rows && x >= 0 && x < this.cols && this.board[y][x] === 0) {
+      this.board[y][x] = -1;
+      return (
+        1 + this.group(y, x + 1) + this.group(y, x - 1) + this.group(y + 1, x) + this.group(y - 1, x)
+      );
+    }
+    return 0;
+  }
+
+  clearGroups() {
+    for (var y = 0; y < this.rows; y++) {
+      for (var x = 0; x < this.cols; x++) {
+        if (this.board[y][x] === -1) {
+          this.board[y][x] = 0;
         }
       }
     }
   }
-  clearGroups();
-  return false;
-}
 
-function s(p) {
-  let x, y;
-  if (Date.now() - t > 20) {
-    sendBoard();
-    t = Date.now();
+  isStupidConfig() {
+    for (var y = 0; y < this.rows; y++) {
+      for (var x = 0; x < this.cols; x++) {
+        if (this.board[y][x] === 0) {
+          if (this.group(y, x) % 4 !== 0) {
+            this.clearGroups();
+            return true; //cannot be filled by tetraminos, stupid config
+          }
+        }
+      }
+    }
+    this.clearGroups();
+    return false;
   }
-  if (blocksPtr >= blocks.length) {
-    return true; //puzzle is solved
-  }
-  var block = blocks[blocksPtr++];
-  if (block === I) {
-    //I shaped block can have 2 rotations.
-    /*
+
+  s(p) {
+    let x, y;
+    if (Date.now() - this.t > 20) {
+      this.sendBoard();
+      this.t = Date.now();
+    }
+    if (this.blocksPtr >= this.blocks.length) {
+      return true; //puzzle is solved
+    }
+    var block = this.blocks[this.blocksPtr++];
+    if (block === I) {
+      //I shaped block can have 2 rotations.
+      /*
      #
      #
      #
      #
      */
-    for (y = 0; y <= rows - 4; y++) {
-      for (x = 0; x <= cols - 1; x++) {
-        if (
-          board[y][x] === 0 &&
-          board[y + 1][x] === 0 &&
-          board[y + 2][x] === 0 &&
-          board[y + 3][x] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x] = p;
-          board[y + 1][x] = p;
-          board[y + 2][x] = p;
-          board[y + 3][x] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            }
-          //otherwise, we need to find another place
-          board[y][x] = 0;
-          board[y + 1][x] = 0;
-          board[y + 2][x] = 0;
-          board[y + 3][x] = 0;
+      for (y = 0; y <= this.rows - 4; y++) {
+        for (x = 0; x <= this.cols - 1; x++) {
+          if (
+            this.board[y][x] === 0 &&
+            this.board[y + 1][x] === 0 &&
+            this.board[y + 2][x] === 0 &&
+            this.board[y + 3][x] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x] = p;
+            this.board[y + 1][x] = p;
+            this.board[y + 2][x] = p;
+            this.board[y + 3][x] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              }
+            //otherwise, we need to find another place
+            this.board[y][x] = 0;
+            this.board[y + 1][x] = 0;
+            this.board[y + 2][x] = 0;
+            this.board[y + 3][x] = 0;
+          }
         }
       }
-    }
-    // ####
-    for (y = 0; y <= rows - 1; y++) {
-      for (x = 0; x <= cols - 4; x++) {
-        if (
-          board[y][x] === 0 &&
-          board[y][x + 1] === 0 &&
-          board[y][x + 2] === 0 &&
-          board[y][x + 3] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x] = p;
-          board[y][x + 1] = p;
-          board[y][x + 2] = p;
-          board[y][x + 3] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x] = 0;
-          board[y][x + 1] = 0;
-          board[y][x + 2] = 0;
-          board[y][x + 3] = 0;
+      // ####
+      for (y = 0; y <= this.rows - 1; y++) {
+        for (x = 0; x <= this.cols - 4; x++) {
+          if (
+            this.board[y][x] === 0 &&
+            this.board[y][x + 1] === 0 &&
+            this.board[y][x + 2] === 0 &&
+            this.board[y][x + 3] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x] = p;
+            this.board[y][x + 1] = p;
+            this.board[y][x + 2] = p;
+            this.board[y][x + 3] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x] = 0;
+            this.board[y][x + 1] = 0;
+            this.board[y][x + 2] = 0;
+            this.board[y][x + 3] = 0;
+          }
         }
       }
+      //we couldn't fina a suitable place for this block, that means that the puzzle is either unsolveable or one of the pieces is in the wrong place
+      //let's put the piece back in the list and continue searching
+      this.blocksPtr--;
+      return false; //0=couldn't find a place for this block
     }
-    //we couldn't fina a suitable place for this block, that means that the puzzle is either unsolveable or one of the pieces is in the wrong place
-    //let's put the piece back in the list and continue searching
-    blocksPtr--;
-    return false; //0=couldn't find a place for this block
-  }
-  if (block === O) {
-    //2x2 square block can have only 1 rotation
-    for (y = 0; y <= rows - 2; y++) {
-      for (x = 0; x <= cols - 2; x++) {
-        if (
-          board[y][x] === 0 &&
-          board[y + 1][x] === 0 &&
-          board[y][x + 1] === 0 &&
-          board[y + 1][x + 1] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x] = p;
-          board[y + 1][x] = p;
-          board[y][x + 1] = p;
-          board[y + 1][x + 1] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x] = 0;
-          board[y + 1][x] = 0;
-          board[y][x + 1] = 0;
-          board[y + 1][x + 1] = 0;
+    if (block === O) {
+      //2x2 square block can have only 1 rotation
+      for (y = 0; y <= this.rows - 2; y++) {
+        for (x = 0; x <= this.cols - 2; x++) {
+          if (
+            this.board[y][x] === 0 &&
+            this.board[y + 1][x] === 0 &&
+            this.board[y][x + 1] === 0 &&
+            this.board[y + 1][x + 1] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x] = p;
+            this.board[y + 1][x] = p;
+            this.board[y][x + 1] = p;
+            this.board[y + 1][x + 1] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x] = 0;
+            this.board[y + 1][x] = 0;
+            this.board[y][x + 1] = 0;
+            this.board[y + 1][x + 1] = 0;
+          }
         }
       }
+      //we couldn't fina a suitable place for this block, that means that the puzzle is either unsolveable or one of the pieces is in the wrong place
+      //let's put the piece back in the list and continue searching
+      this.blocksPtr--;
+      return false; //0=couldn't find a place for this block
     }
-    //we couldn't fina a suitable place for this block, that means that the puzzle is either unsolveable or one of the pieces is in the wrong place
-    //let's put the piece back in the list and continue searching
-    blocksPtr--;
-    return false; //0=couldn't find a place for this block
-  }
 
-  if (block === T) {
-    //T shaped block can have 4 rotations
-    /*
+    if (block === T) {
+      //T shaped block can have 4 rotations
+      /*
      ###
      _#
      */
-    for (y = 0; y <= rows - 2; y++) {
-      for (x = 0; x <= cols - 3; x++) {
-        if (
-          board[y][x] === 0 &&
-          board[y][x + 1] === 0 &&
-          board[y + 1][x + 1] === 0 &&
-          board[y][x + 2] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x] = p;
-          board[y][x + 1] = p;
-          board[y + 1][x + 1] = p;
-          board[y][x + 2] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x] = 0;
-          board[y][x + 1] = 0;
-          board[y + 1][x + 1] = 0;
-          board[y][x + 2] = 0;
+      for (y = 0; y <= this.rows - 2; y++) {
+        for (x = 0; x <= this.cols - 3; x++) {
+          if (
+            this.board[y][x] === 0 &&
+            this.board[y][x + 1] === 0 &&
+            this.board[y + 1][x + 1] === 0 &&
+            this.board[y][x + 2] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x] = p;
+            this.board[y][x + 1] = p;
+            this.board[y + 1][x + 1] = p;
+            this.board[y][x + 2] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x] = 0;
+            this.board[y][x + 1] = 0;
+            this.board[y + 1][x + 1] = 0;
+            this.board[y][x + 2] = 0;
+          }
         }
       }
-    }
-    /*
+      /*
      #
      ##
      #
      */
-    for (y = 0; y <= rows - 3; y++) {
-      for (x = 0; x <= cols - 2; x++) {
-        if (
-          board[y][x] === 0 &&
-          board[y + 1][x] === 0 &&
-          board[y + 1][x + 1] === 0 &&
-          board[y + 2][x] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x] = p;
-          board[y + 1][x] = p;
-          board[y + 1][x + 1] = p;
-          board[y + 2][x] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x] = 0;
-          board[y + 1][x] = 0;
-          board[y + 1][x + 1] = 0;
-          board[y + 2][x] = 0;
+      for (y = 0; y <= this.rows - 3; y++) {
+        for (x = 0; x <= this.cols - 2; x++) {
+          if (
+            this.board[y][x] === 0 &&
+            this.board[y + 1][x] === 0 &&
+            this.board[y + 1][x + 1] === 0 &&
+            this.board[y + 2][x] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x] = p;
+            this.board[y + 1][x] = p;
+            this.board[y + 1][x + 1] = p;
+            this.board[y + 2][x] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x] = 0;
+            this.board[y + 1][x] = 0;
+            this.board[y + 1][x + 1] = 0;
+            this.board[y + 2][x] = 0;
+          }
         }
       }
-    }
-    /*
+      /*
      _#
      ##
      _#
      */
-    for (y = 0; y <= rows - 3; y++) {
-      for (x = 0; x <= cols - 2; x++) {
-        if (
-          board[y][x + 1] === 0 &&
-          board[y + 1][x] === 0 &&
-          board[y + 1][x + 1] === 0 &&
-          board[y + 2][x + 1] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x + 1] = p;
-          board[y + 1][x] = p;
-          board[y + 1][x + 1] = p;
-          board[y + 2][x + 1] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x + 1] = 0;
-          board[y + 1][x] = 0;
-          board[y + 1][x + 1] = 0;
-          board[y + 2][x + 1] = 0;
+      for (y = 0; y <= this.rows - 3; y++) {
+        for (x = 0; x <= this.cols - 2; x++) {
+          if (
+            this.board[y][x + 1] === 0 &&
+            this.board[y + 1][x] === 0 &&
+            this.board[y + 1][x + 1] === 0 &&
+            this.board[y + 2][x + 1] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x + 1] = p;
+            this.board[y + 1][x] = p;
+            this.board[y + 1][x + 1] = p;
+            this.board[y + 2][x + 1] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x + 1] = 0;
+            this.board[y + 1][x] = 0;
+            this.board[y + 1][x + 1] = 0;
+            this.board[y + 2][x + 1] = 0;
+          }
         }
       }
-    }
-    /*
+      /*
      _#
      ###
      */
-    for (y = 0; y <= rows - 2; y++) {
-      for (x = 0; x <= cols - 3; x++) {
-        if (
-          board[y + 1][x] === 0 &&
-          board[y][x + 1] === 0 &&
-          board[y + 1][x + 1] === 0 &&
-          board[y + 1][x + 2] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y + 1][x] = p;
-          board[y][x + 1] = p;
-          board[y + 1][x + 1] = p;
-          board[y + 1][x + 2] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y + 1][x] = 0;
-          board[y][x + 1] = 0;
-          board[y + 1][x + 1] = 0;
-          board[y + 1][x + 2] = 0;
+      for (y = 0; y <= this.rows - 2; y++) {
+        for (x = 0; x <= this.cols - 3; x++) {
+          if (
+            this.board[y + 1][x] === 0 &&
+            this.board[y][x + 1] === 0 &&
+            this.board[y + 1][x + 1] === 0 &&
+            this.board[y + 1][x + 2] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y + 1][x] = p;
+            this.board[y][x + 1] = p;
+            this.board[y + 1][x + 1] = p;
+            this.board[y + 1][x + 2] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y + 1][x] = 0;
+            this.board[y][x + 1] = 0;
+            this.board[y + 1][x + 1] = 0;
+            this.board[y + 1][x + 2] = 0;
+          }
         }
       }
+      //we couldn't fina a suitable place for this block, that means that the puzzle is either unsolveable or one of the pieces is in the wrong place
+      //let's put the piece back in the list and continue searching
+      this.blocksPtr--;
+      return false; //0=couldn't find a place for this block
     }
-    //we couldn't fina a suitable place for this block, that means that the puzzle is either unsolveable or one of the pieces is in the wrong place
-    //let's put the piece back in the list and continue searching
-    blocksPtr--;
-    return false; //0=couldn't find a place for this block
-  }
 
-  if (block === J) {
-    //J shaped block can have 4 rotations
-    /*
+    if (block === J) {
+      //J shaped block can have 4 rotations
+      /*
      ###
      __#
      */
-    for (y = 0; y <= rows - 2; y++) {
-      for (x = 0; x <= cols - 3; x++) {
-        if (
-          board[y][x] === 0 &&
-          board[y][x + 1] === 0 &&
-          board[y + 1][x + 2] === 0 &&
-          board[y][x + 2] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x] = p;
-          board[y][x + 1] = p;
-          board[y + 1][x + 2] = p;
-          board[y][x + 2] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x] = 0;
-          board[y][x + 1] = 0;
-          board[y + 1][x + 2] = 0;
-          board[y][x + 2] = 0;
+      for (y = 0; y <= this.rows - 2; y++) {
+        for (x = 0; x <= this.cols - 3; x++) {
+          if (
+            this.board[y][x] === 0 &&
+            this.board[y][x + 1] === 0 &&
+            this.board[y + 1][x + 2] === 0 &&
+            this.board[y][x + 2] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x] = p;
+            this.board[y][x + 1] = p;
+            this.board[y + 1][x + 2] = p;
+            this.board[y][x + 2] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x] = 0;
+            this.board[y][x + 1] = 0;
+            this.board[y + 1][x + 2] = 0;
+            this.board[y][x + 2] = 0;
+          }
         }
       }
-    }
-    /*
+      /*
      #
      ###
      */
-    for (y = 0; y <= rows - 2; y++) {
-      for (x = 0; x <= cols - 3; x++) {
-        if (
-          board[y + 1][x] === 0 &&
-          board[y][x] === 0 &&
-          board[y + 1][x + 1] === 0 &&
-          board[y + 1][x + 2] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y + 1][x] = p;
-          board[y][x] = p;
-          board[y + 1][x + 1] = p;
-          board[y + 1][x + 2] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y + 1][x] = 0;
-          board[y][x] = 0;
-          board[y + 1][x + 1] = 0;
-          board[y + 1][x + 2] = 0;
+      for (y = 0; y <= this.rows - 2; y++) {
+        for (x = 0; x <= this.cols - 3; x++) {
+          if (
+            this.board[y + 1][x] === 0 &&
+            this.board[y][x] === 0 &&
+            this.board[y + 1][x + 1] === 0 &&
+            this.board[y + 1][x + 2] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y + 1][x] = p;
+            this.board[y][x] = p;
+            this.board[y + 1][x + 1] = p;
+            this.board[y + 1][x + 2] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y + 1][x] = 0;
+            this.board[y][x] = 0;
+            this.board[y + 1][x + 1] = 0;
+            this.board[y + 1][x + 2] = 0;
+          }
         }
       }
-    }
-    /*
+      /*
      ##
      #
      #
      */
-    for (y = 0; y <= rows - 3; y++) {
-      for (x = 0; x <= cols - 2; x++) {
-        if (
-          board[y][x] === 0 &&
-          board[y + 1][x] === 0 &&
-          board[y][x + 1] === 0 &&
-          board[y + 2][x] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x] = p;
-          board[y + 1][x] = p;
-          board[y][x + 1] = p;
-          board[y + 2][x] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x] = 0;
-          board[y + 1][x] = 0;
-          board[y][x + 1] = 0;
-          board[y + 2][x] = 0;
+      for (y = 0; y <= this.rows - 3; y++) {
+        for (x = 0; x <= this.cols - 2; x++) {
+          if (
+            this.board[y][x] === 0 &&
+            this.board[y + 1][x] === 0 &&
+            this.board[y][x + 1] === 0 &&
+            this.board[y + 2][x] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x] = p;
+            this.board[y + 1][x] = p;
+            this.board[y][x + 1] = p;
+            this.board[y + 2][x] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x] = 0;
+            this.board[y + 1][x] = 0;
+            this.board[y][x + 1] = 0;
+            this.board[y + 2][x] = 0;
+          }
         }
       }
-    }
-    /*
+      /*
      _#
      _#
      ##
      */
-    for (y = 0; y <= rows - 3; y++) {
-      for (x = 0; x <= cols - 2; x++) {
-        if (
-          board[y][x + 1] === 0 &&
-          board[y + 2][x] === 0 &&
-          board[y + 1][x + 1] === 0 &&
-          board[y + 2][x + 1] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x + 1] = p;
-          board[y + 2][x] = p;
-          board[y + 1][x + 1] = p;
-          board[y + 2][x + 1] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x + 1] = 0;
-          board[y + 2][x] = 0;
-          board[y + 1][x + 1] = 0;
-          board[y + 2][x + 1] = 0;
+      for (y = 0; y <= this.rows - 3; y++) {
+        for (x = 0; x <= this.cols - 2; x++) {
+          if (
+            this.board[y][x + 1] === 0 &&
+            this.board[y + 2][x] === 0 &&
+            this.board[y + 1][x + 1] === 0 &&
+            this.board[y + 2][x + 1] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x + 1] = p;
+            this.board[y + 2][x] = p;
+            this.board[y + 1][x + 1] = p;
+            this.board[y + 2][x + 1] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x + 1] = 0;
+            this.board[y + 2][x] = 0;
+            this.board[y + 1][x + 1] = 0;
+            this.board[y + 2][x + 1] = 0;
+          }
         }
       }
+      //we couldn't fina a suitable place for this block, that means that the puzzle is either unsolveable or one of the pieces is in the wrong place
+      //let's put the piece back in the list and continue searching
+      this.blocksPtr--;
+      return false; //0=couldn't find a place for this block
     }
-    //we couldn't fina a suitable place for this block, that means that the puzzle is either unsolveable or one of the pieces is in the wrong place
-    //let's put the piece back in the list and continue searching
-    blocksPtr--;
-    return false; //0=couldn't find a place for this block
-  }
 
-  if (block === L) {
-    //L shaped block can have 4 rotations
-    /*
+    if (block === L) {
+      //L shaped block can have 4 rotations
+      /*
      ###
      #
      */
-    for (y = 0; y <= rows - 2; y++) {
-      for (x = 0; x <= cols - 3; x++) {
-        if (
-          board[y][x] === 0 &&
-          board[y][x + 1] === 0 &&
-          board[y + 1][x] === 0 &&
-          board[y][x + 2] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x] = p;
-          board[y][x + 1] = p;
-          board[y + 1][x] = p;
-          board[y][x + 2] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x] = 0;
-          board[y][x + 1] = 0;
-          board[y + 1][x] = 0;
-          board[y][x + 2] = 0;
+      for (y = 0; y <= this.rows - 2; y++) {
+        for (x = 0; x <= this.cols - 3; x++) {
+          if (
+            this.board[y][x] === 0 &&
+            this.board[y][x + 1] === 0 &&
+            this.board[y + 1][x] === 0 &&
+            this.board[y][x + 2] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x] = p;
+            this.board[y][x + 1] = p;
+            this.board[y + 1][x] = p;
+            this.board[y][x + 2] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x] = 0;
+            this.board[y][x + 1] = 0;
+            this.board[y + 1][x] = 0;
+            this.board[y][x + 2] = 0;
+          }
         }
       }
-    }
-    /*
+      /*
      #
      #
      ##
      */
-    for (y = 0; y <= rows - 3; y++) {
-      for (x = 0; x <= cols - 2; x++) {
-        if (
-          board[y][x] === 0 &&
-          board[y + 1][x] === 0 &&
-          board[y + 2][x + 1] === 0 &&
-          board[y + 2][x] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x] = p;
-          board[y + 1][x] = p;
-          board[y + 2][x + 1] = p;
-          board[y + 2][x] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x] = 0;
-          board[y + 1][x] = 0;
-          board[y + 2][x + 1] = 0;
-          board[y + 2][x] = 0;
+      for (y = 0; y <= this.rows - 3; y++) {
+        for (x = 0; x <= this.cols - 2; x++) {
+          if (
+            this.board[y][x] === 0 &&
+            this.board[y + 1][x] === 0 &&
+            this.board[y + 2][x + 1] === 0 &&
+            this.board[y + 2][x] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x] = p;
+            this.board[y + 1][x] = p;
+            this.board[y + 2][x + 1] = p;
+            this.board[y + 2][x] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x] = 0;
+            this.board[y + 1][x] = 0;
+            this.board[y + 2][x + 1] = 0;
+            this.board[y + 2][x] = 0;
+          }
         }
       }
-    }
-    /*
+      /*
      ##
      _#
      _#
      */
-    for (y = 0; y <= rows - 3; y++) {
-      for (x = 0; x <= cols - 2; x++) {
-        if (
-          board[y][x + 1] === 0 &&
-          board[y][x] === 0 &&
-          board[y + 1][x + 1] === 0 &&
-          board[y + 2][x + 1] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x + 1] = p;
-          board[y][x] = p;
-          board[y + 1][x + 1] = p;
-          board[y + 2][x + 1] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x + 1] = 0;
-          board[y][x] = 0;
-          board[y + 1][x + 1] = 0;
-          board[y + 2][x + 1] = 0;
+      for (y = 0; y <= this.rows - 3; y++) {
+        for (x = 0; x <= this.cols - 2; x++) {
+          if (
+            this.board[y][x + 1] === 0 &&
+            this.board[y][x] === 0 &&
+            this.board[y + 1][x + 1] === 0 &&
+            this.board[y + 2][x + 1] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x + 1] = p;
+            this.board[y][x] = p;
+            this.board[y + 1][x + 1] = p;
+            this.board[y + 2][x + 1] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x + 1] = 0;
+            this.board[y][x] = 0;
+            this.board[y + 1][x + 1] = 0;
+            this.board[y + 2][x + 1] = 0;
+          }
         }
       }
-    }
-    /*
+      /*
      __#
      ###
      */
-    for (y = 0; y <= rows - 2; y++) {
-      for (x = 0; x <= cols - 3; x++) {
-        if (
-          board[y + 1][x] === 0 &&
-          board[y][x + 2] === 0 &&
-          board[y + 1][x + 1] === 0 &&
-          board[y + 1][x + 2] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y + 1][x] = p;
-          board[y][x + 2] = p;
-          board[y + 1][x + 1] = p;
-          board[y + 1][x + 2] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y + 1][x] = 0;
-          board[y][x + 2] = 0;
-          board[y + 1][x + 1] = 0;
-          board[y + 1][x + 2] = 0;
+      for (y = 0; y <= this.rows - 2; y++) {
+        for (x = 0; x <= this.cols - 3; x++) {
+          if (
+            this.board[y + 1][x] === 0 &&
+            this.board[y][x + 2] === 0 &&
+            this.board[y + 1][x + 1] === 0 &&
+            this.board[y + 1][x + 2] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y + 1][x] = p;
+            this.board[y][x + 2] = p;
+            this.board[y + 1][x + 1] = p;
+            this.board[y + 1][x + 2] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y + 1][x] = 0;
+            this.board[y][x + 2] = 0;
+            this.board[y + 1][x + 1] = 0;
+            this.board[y + 1][x + 2] = 0;
+          }
         }
       }
+      //we couldn't fina a suitable place for this block, that means that the puzzle is either unsolveable or one of the pieces is in the wrong place
+      //let's put the piece back in the list and continue searching
+      this.blocksPtr--;
+      return false; //0=couldn't find a place for this block
     }
-    //we couldn't fina a suitable place for this block, that means that the puzzle is either unsolveable or one of the pieces is in the wrong place
-    //let's put the piece back in the list and continue searching
-    blocksPtr--;
-    return false; //0=couldn't find a place for this block
-  }
 
-  if (block === S) {
-    //S shaped block can have 2 rotations
-    /*
+    if (block === S) {
+      //S shaped block can have 2 rotations
+      /*
      #
      ##
      _#
      */
-    for (y = 0; y <= rows - 3; y++) {
-      for (x = 0; x <= cols - 2; x++) {
-        if (
-          board[y][x] === 0 &&
-          board[y + 1][x] === 0 &&
-          board[y + 1][x + 1] === 0 &&
-          board[y + 2][x + 1] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x] = p;
-          board[y + 1][x] = p;
-          board[y + 1][x + 1] = p;
-          board[y + 2][x + 1] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x] = 0;
-          board[y + 1][x] = 0;
-          board[y + 1][x + 1] = 0;
-          board[y + 2][x + 1] = 0;
+      for (y = 0; y <= this.rows - 3; y++) {
+        for (x = 0; x <= this.cols - 2; x++) {
+          if (
+            this.board[y][x] === 0 &&
+            this.board[y + 1][x] === 0 &&
+            this.board[y + 1][x + 1] === 0 &&
+            this.board[y + 2][x + 1] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x] = p;
+            this.board[y + 1][x] = p;
+            this.board[y + 1][x + 1] = p;
+            this.board[y + 2][x + 1] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x] = 0;
+            this.board[y + 1][x] = 0;
+            this.board[y + 1][x + 1] = 0;
+            this.board[y + 2][x + 1] = 0;
+          }
         }
       }
-    }
-    /*
+      /*
      _##
      ##
      */
-    for (y = 0; y <= rows - 2; y++) {
-      for (x = 0; x <= cols - 3; x++) {
-        if (
-          board[y][x + 1] === 0 &&
-          board[y][x + 2] === 0 &&
-          board[y + 1][x] === 0 &&
-          board[y + 1][x + 1] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x + 1] = p;
-          board[y][x + 2] = p;
-          board[y + 1][x] = p;
-          board[y + 1][x + 1] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x + 1] = 0;
-          board[y][x + 2] = 0;
-          board[y + 1][x] = 0;
-          board[y + 1][x + 1] = 0;
+      for (y = 0; y <= this.rows - 2; y++) {
+        for (x = 0; x <= this.cols - 3; x++) {
+          if (
+            this.board[y][x + 1] === 0 &&
+            this.board[y][x + 2] === 0 &&
+            this.board[y + 1][x] === 0 &&
+            this.board[y + 1][x + 1] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x + 1] = p;
+            this.board[y][x + 2] = p;
+            this.board[y + 1][x] = p;
+            this.board[y + 1][x + 1] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x + 1] = 0;
+            this.board[y][x + 2] = 0;
+            this.board[y + 1][x] = 0;
+            this.board[y + 1][x + 1] = 0;
+          }
         }
       }
+      //we couldn't fina a suitable place for this block, that means that the puzzle is either unsolveable or one of the pieces is in the wrong place
+      //let's put the piece back in the list and continue searching
+      this.blocksPtr--;
+      return false; //0=couldn't find a place for this block
     }
-    //we couldn't fina a suitable place for this block, that means that the puzzle is either unsolveable or one of the pieces is in the wrong place
-    //let's put the piece back in the list and continue searching
-    blocksPtr--;
-    return false; //0=couldn't find a place for this block
-  }
 
-  if (block === Z) {
-    //Z shaped block can have 2 rotations
-    /*
-     **
+    if (block === Z) {
+      //Z shaped block can have 2 rotations
+      /*
+       **
      _**
      */
-    for (y = 0; y <= rows - 2; y++) {
-      for (x = 0; x <= cols - 3; x++) {
-        if (
-          board[y][x] === 0 &&
-          board[y][x + 1] === 0 &&
-          board[y + 1][x + 1] === 0 &&
-          board[y + 1][x + 2] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x] = p;
-          board[y][x + 1] = p;
-          board[y + 1][x + 1] = p;
-          board[y + 1][x + 2] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x] = 0;
-          board[y][x + 1] = 0;
-          board[y + 1][x + 1] = 0;
-          board[y + 1][x + 2] = 0;
+      for (y = 0; y <= this.rows - 2; y++) {
+        for (x = 0; x <= this.cols - 3; x++) {
+          if (
+            this.board[y][x] === 0 &&
+            this.board[y][x + 1] === 0 &&
+            this.board[y + 1][x + 1] === 0 &&
+            this.board[y + 1][x + 2] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x] = p;
+            this.board[y][x + 1] = p;
+            this.board[y + 1][x + 1] = p;
+            this.board[y + 1][x + 2] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x] = 0;
+            this.board[y][x + 1] = 0;
+            this.board[y + 1][x + 1] = 0;
+            this.board[y + 1][x + 2] = 0;
+          }
         }
       }
-    }
-    /*
+      /*
      _#
      ##
      #
      */
-    for (y = 0; y <= rows - 3; y++) {
-      for (x = 0; x <= cols - 2; x++) {
-        if (
-          board[y][x + 1] === 0 &&
-          board[y + 1][x] === 0 &&
-          board[y + 1][x + 1] === 0 &&
-          board[y + 2][x] === 0
-        ) {
-          //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
-          board[y][x + 1] = p;
-          board[y + 1][x] = p;
-          board[y + 1][x + 1] = p;
-          board[y + 2][x] = p;
-          if (!isStupidConfig())
-            if (s(p + 1)) {
-              return true; //this is the right place for this block
-            } //otherwise, we need to find another place
-          board[y][x + 1] = 0;
-          board[y + 1][x] = 0;
-          board[y + 1][x + 1] = 0;
-          board[y + 2][x] = 0;
+      for (y = 0; y <= this.rows - 3; y++) {
+        for (x = 0; x <= this.cols - 2; x++) {
+          if (
+            this.board[y][x + 1] === 0 &&
+            this.board[y + 1][x] === 0 &&
+            this.board[y + 1][x + 1] === 0 &&
+            this.board[y + 2][x] === 0
+          ) {
+            //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
+            this.board[y][x + 1] = p;
+            this.board[y + 1][x] = p;
+            this.board[y + 1][x + 1] = p;
+            this.board[y + 2][x] = p;
+            if (!this.isStupidConfig())
+              if (this.s(p + 1)) {
+                return true; //this is the right place for this block
+              } //otherwise, we need to find another place
+            this.board[y][x + 1] = 0;
+            this.board[y + 1][x] = 0;
+            this.board[y + 1][x + 1] = 0;
+            this.board[y + 2][x] = 0;
+          }
         }
       }
+      //we couldn't fina a suitable place for this block, that means that the puzzle is either unsolveable or one of the pieces is in the wrong place
+      //let's put the piece back in the list and continue searching
+      this.blocksPtr--;
+      return false; //0=couldn't find a place for this block
     }
-    //we couldn't fina a suitable place for this block, that means that the puzzle is either unsolveable or one of the pieces is in the wrong place
-    //let's put the piece back in the list and continue searching
-    blocksPtr--;
-    return false; //0=couldn't find a place for this block
   }
+
 }
 
-export default solve;
+
+export default Solver;
