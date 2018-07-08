@@ -24,7 +24,7 @@ this.addEventListener(
   function(e) {
     var params = e.data.split(" ");
 
-    if (params[0].indexOf("s") == 0) {
+    if (params[0].indexOf("s") === 0) {
       rows = Number(params[1]);
       cols = Number(params[2]);
       iblocks = Number(params[3]);
@@ -83,7 +83,7 @@ function sendBoard() {
 
 var t = Date.now();
 function solve() {
-  if (nPieces * 4 != rows * cols) postMessage("impossible");
+  if (nPieces * 4 !== rows * cols) postMessage("impossible");
   else if (s(1)) {
     //cannot be filled by tetraminos
     sendBoard();
@@ -91,12 +91,8 @@ function solve() {
   } else postMessage("impossible");
 }
 
-function isOccupied(y, x) {
-  return y >= 0 && y < rows && x >= 0 && x < cols ? board[y][x] != 0 : true;
-}
-
 function group(y, x) {
-  if (y >= 0 && y < rows && x >= 0 && x < cols && board[y][x] == 0) {
+  if (y >= 0 && y < rows && x >= 0 && x < cols && board[y][x] === 0) {
     board[y][x] = -1;
     return (
       1 + group(y, x + 1) + group(y, x - 1) + group(y + 1, x) + group(y - 1, x)
@@ -108,7 +104,7 @@ function group(y, x) {
 function clearGroups() {
   for (var y = 0; y < rows; y++) {
     for (var x = 0; x < cols; x++) {
-      if (board[y][x] == -1) {
+      if (board[y][x] === -1) {
         board[y][x] = 0;
       }
     }
@@ -118,8 +114,8 @@ function clearGroups() {
 function isStupidConfig() {
   for (var y = 0; y < rows; y++) {
     for (var x = 0; x < cols; x++) {
-      if (board[y][x] == 0) {
-        if (group(y, x) % 4 != 0) {
+      if (board[y][x] === 0) {
+        if (group(y, x) % 4 !== 0) {
           clearGroups();
           return true; //cannot be filled by tetraminos, stupid config
         }
@@ -139,7 +135,7 @@ function s(p) {
     return true; //puzzle is solved
   }
   var block = blocks[blocksPtr++];
-  if (block == I) {
+  if (block === I) {
     //I shaped block can have 2 rotations.
     /*
      #
@@ -150,10 +146,10 @@ function s(p) {
     for (var y = 0; y <= rows - 4; y++) {
       for (var x = 0; x <= cols - 1; x++) {
         if (
-          board[y][x] == 0 &&
-          board[y + 1][x] == 0 &&
-          board[y + 2][x] == 0 &&
-          board[y + 3][x] == 0
+          board[y][x] === 0 &&
+          board[y + 1][x] === 0 &&
+          board[y + 2][x] === 0 &&
+          board[y + 3][x] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x] = p;
@@ -176,10 +172,10 @@ function s(p) {
     for (var y = 0; y <= rows - 1; y++) {
       for (var x = 0; x <= cols - 4; x++) {
         if (
-          board[y][x] == 0 &&
-          board[y][x + 1] == 0 &&
-          board[y][x + 2] == 0 &&
-          board[y][x + 3] == 0
+          board[y][x] === 0 &&
+          board[y][x + 1] === 0 &&
+          board[y][x + 2] === 0 &&
+          board[y][x + 3] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x] = p;
@@ -202,15 +198,15 @@ function s(p) {
     blocksPtr--;
     return false; //0=couldn't find a place for this block
   }
-  if (block == O) {
+  if (block === O) {
     //2x2 square block can have only 1 rotation
     for (var y = 0; y <= rows - 2; y++) {
       for (var x = 0; x <= cols - 2; x++) {
         if (
-          board[y][x] == 0 &&
-          board[y + 1][x] == 0 &&
-          board[y][x + 1] == 0 &&
-          board[y + 1][x + 1] == 0
+          board[y][x] === 0 &&
+          board[y + 1][x] === 0 &&
+          board[y][x + 1] === 0 &&
+          board[y + 1][x + 1] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x] = p;
@@ -234,7 +230,7 @@ function s(p) {
     return false; //0=couldn't find a place for this block
   }
 
-  if (block == T) {
+  if (block === T) {
     //T shaped block can have 4 rotations
     /*
      ###
@@ -243,10 +239,10 @@ function s(p) {
     for (var y = 0; y <= rows - 2; y++) {
       for (var x = 0; x <= cols - 3; x++) {
         if (
-          board[y][x] == 0 &&
-          board[y][x + 1] == 0 &&
-          board[y + 1][x + 1] == 0 &&
-          board[y][x + 2] == 0
+          board[y][x] === 0 &&
+          board[y][x + 1] === 0 &&
+          board[y + 1][x + 1] === 0 &&
+          board[y][x + 2] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x] = p;
@@ -272,10 +268,10 @@ function s(p) {
     for (var y = 0; y <= rows - 3; y++) {
       for (var x = 0; x <= cols - 2; x++) {
         if (
-          board[y][x] == 0 &&
-          board[y + 1][x] == 0 &&
-          board[y + 1][x + 1] == 0 &&
-          board[y + 2][x] == 0
+          board[y][x] === 0 &&
+          board[y + 1][x] === 0 &&
+          board[y + 1][x + 1] === 0 &&
+          board[y + 2][x] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x] = p;
@@ -301,10 +297,10 @@ function s(p) {
     for (var y = 0; y <= rows - 3; y++) {
       for (var x = 0; x <= cols - 2; x++) {
         if (
-          board[y][x + 1] == 0 &&
-          board[y + 1][x] == 0 &&
-          board[y + 1][x + 1] == 0 &&
-          board[y + 2][x + 1] == 0
+          board[y][x + 1] === 0 &&
+          board[y + 1][x] === 0 &&
+          board[y + 1][x + 1] === 0 &&
+          board[y + 2][x + 1] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x + 1] = p;
@@ -329,10 +325,10 @@ function s(p) {
     for (var y = 0; y <= rows - 2; y++) {
       for (var x = 0; x <= cols - 3; x++) {
         if (
-          board[y + 1][x] == 0 &&
-          board[y][x + 1] == 0 &&
-          board[y + 1][x + 1] == 0 &&
-          board[y + 1][x + 2] == 0
+          board[y + 1][x] === 0 &&
+          board[y][x + 1] === 0 &&
+          board[y + 1][x + 1] === 0 &&
+          board[y + 1][x + 2] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y + 1][x] = p;
@@ -356,7 +352,7 @@ function s(p) {
     return false; //0=couldn't find a place for this block
   }
 
-  if (block == J) {
+  if (block === J) {
     //J shaped block can have 4 rotations
     /*
      ###
@@ -365,10 +361,10 @@ function s(p) {
     for (var y = 0; y <= rows - 2; y++) {
       for (var x = 0; x <= cols - 3; x++) {
         if (
-          board[y][x] == 0 &&
-          board[y][x + 1] == 0 &&
-          board[y + 1][x + 2] == 0 &&
-          board[y][x + 2] == 0
+          board[y][x] === 0 &&
+          board[y][x + 1] === 0 &&
+          board[y + 1][x + 2] === 0 &&
+          board[y][x + 2] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x] = p;
@@ -393,10 +389,10 @@ function s(p) {
     for (var y = 0; y <= rows - 2; y++) {
       for (var x = 0; x <= cols - 3; x++) {
         if (
-          board[y + 1][x] == 0 &&
-          board[y][x] == 0 &&
-          board[y + 1][x + 1] == 0 &&
-          board[y + 1][x + 2] == 0
+          board[y + 1][x] === 0 &&
+          board[y][x] === 0 &&
+          board[y + 1][x + 1] === 0 &&
+          board[y + 1][x + 2] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y + 1][x] = p;
@@ -422,10 +418,10 @@ function s(p) {
     for (var y = 0; y <= rows - 3; y++) {
       for (var x = 0; x <= cols - 2; x++) {
         if (
-          board[y][x] == 0 &&
-          board[y + 1][x] == 0 &&
-          board[y][x + 1] == 0 &&
-          board[y + 2][x] == 0
+          board[y][x] === 0 &&
+          board[y + 1][x] === 0 &&
+          board[y][x + 1] === 0 &&
+          board[y + 2][x] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x] = p;
@@ -451,10 +447,10 @@ function s(p) {
     for (var y = 0; y <= rows - 3; y++) {
       for (var x = 0; x <= cols - 2; x++) {
         if (
-          board[y][x + 1] == 0 &&
-          board[y + 2][x] == 0 &&
-          board[y + 1][x + 1] == 0 &&
-          board[y + 2][x + 1] == 0
+          board[y][x + 1] === 0 &&
+          board[y + 2][x] === 0 &&
+          board[y + 1][x + 1] === 0 &&
+          board[y + 2][x + 1] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x + 1] = p;
@@ -478,7 +474,7 @@ function s(p) {
     return false; //0=couldn't find a place for this block
   }
 
-  if (block == L) {
+  if (block === L) {
     //L shaped block can have 4 rotations
     /*
      ###
@@ -487,10 +483,10 @@ function s(p) {
     for (var y = 0; y <= rows - 2; y++) {
       for (var x = 0; x <= cols - 3; x++) {
         if (
-          board[y][x] == 0 &&
-          board[y][x + 1] == 0 &&
-          board[y + 1][x] == 0 &&
-          board[y][x + 2] == 0
+          board[y][x] === 0 &&
+          board[y][x + 1] === 0 &&
+          board[y + 1][x] === 0 &&
+          board[y][x + 2] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x] = p;
@@ -516,10 +512,10 @@ function s(p) {
     for (var y = 0; y <= rows - 3; y++) {
       for (var x = 0; x <= cols - 2; x++) {
         if (
-          board[y][x] == 0 &&
-          board[y + 1][x] == 0 &&
-          board[y + 2][x + 1] == 0 &&
-          board[y + 2][x] == 0
+          board[y][x] === 0 &&
+          board[y + 1][x] === 0 &&
+          board[y + 2][x + 1] === 0 &&
+          board[y + 2][x] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x] = p;
@@ -545,10 +541,10 @@ function s(p) {
     for (var y = 0; y <= rows - 3; y++) {
       for (var x = 0; x <= cols - 2; x++) {
         if (
-          board[y][x + 1] == 0 &&
-          board[y][x] == 0 &&
-          board[y + 1][x + 1] == 0 &&
-          board[y + 2][x + 1] == 0
+          board[y][x + 1] === 0 &&
+          board[y][x] === 0 &&
+          board[y + 1][x + 1] === 0 &&
+          board[y + 2][x + 1] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x + 1] = p;
@@ -573,10 +569,10 @@ function s(p) {
     for (var y = 0; y <= rows - 2; y++) {
       for (var x = 0; x <= cols - 3; x++) {
         if (
-          board[y + 1][x] == 0 &&
-          board[y][x + 2] == 0 &&
-          board[y + 1][x + 1] == 0 &&
-          board[y + 1][x + 2] == 0
+          board[y + 1][x] === 0 &&
+          board[y][x + 2] === 0 &&
+          board[y + 1][x + 1] === 0 &&
+          board[y + 1][x + 2] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y + 1][x] = p;
@@ -600,7 +596,7 @@ function s(p) {
     return false; //0=couldn't find a place for this block
   }
 
-  if (block == S) {
+  if (block === S) {
     //S shaped block can have 2 rotations
     /*
      #
@@ -610,10 +606,10 @@ function s(p) {
     for (var y = 0; y <= rows - 3; y++) {
       for (var x = 0; x <= cols - 2; x++) {
         if (
-          board[y][x] == 0 &&
-          board[y + 1][x] == 0 &&
-          board[y + 1][x + 1] == 0 &&
-          board[y + 2][x + 1] == 0
+          board[y][x] === 0 &&
+          board[y + 1][x] === 0 &&
+          board[y + 1][x + 1] === 0 &&
+          board[y + 2][x + 1] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x] = p;
@@ -638,10 +634,10 @@ function s(p) {
     for (var y = 0; y <= rows - 2; y++) {
       for (var x = 0; x <= cols - 3; x++) {
         if (
-          board[y][x + 1] == 0 &&
-          board[y][x + 2] == 0 &&
-          board[y + 1][x] == 0 &&
-          board[y + 1][x + 1] == 0
+          board[y][x + 1] === 0 &&
+          board[y][x + 2] === 0 &&
+          board[y + 1][x] === 0 &&
+          board[y + 1][x + 1] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x + 1] = p;
@@ -665,7 +661,7 @@ function s(p) {
     return false; //0=couldn't find a place for this block
   }
 
-  if (block == Z) {
+  if (block === Z) {
     //Z shaped block can have 2 rotations
     /*
      **
@@ -674,10 +670,10 @@ function s(p) {
     for (var y = 0; y <= rows - 2; y++) {
       for (var x = 0; x <= cols - 3; x++) {
         if (
-          board[y][x] == 0 &&
-          board[y][x + 1] == 0 &&
-          board[y + 1][x + 1] == 0 &&
-          board[y + 1][x + 2] == 0
+          board[y][x] === 0 &&
+          board[y][x + 1] === 0 &&
+          board[y + 1][x + 1] === 0 &&
+          board[y + 1][x + 2] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x] = p;
@@ -703,10 +699,10 @@ function s(p) {
     for (var y = 0; y <= rows - 3; y++) {
       for (var x = 0; x <= cols - 2; x++) {
         if (
-          board[y][x + 1] == 0 &&
-          board[y + 1][x] == 0 &&
-          board[y + 1][x + 1] == 0 &&
-          board[y + 2][x] == 0
+          board[y][x + 1] === 0 &&
+          board[y + 1][x] === 0 &&
+          board[y + 1][x + 1] === 0 &&
+          board[y + 2][x] === 0
         ) {
           //we found a hole that fits this block, we'll place it here and see if the puzzle can be solved
           board[y][x + 1] = p;
