@@ -32,7 +32,9 @@ const getState = () => {
 };
 
 class App extends Component {
-  state = {};
+  state = {
+    solved: false,
+  };
 
   solve = () => {
     const {
@@ -62,7 +64,8 @@ class App extends Component {
       }
       if (params[0].indexOf("grid") === 0) {
         this.setState({
-          solution: params,
+          solved: true,
+          params,
           nPieces
         });
       }
@@ -95,10 +98,10 @@ class App extends Component {
             Fills a rectangle with tetraminos.<br />Requires HTML5 Canvas and Web
             Workers support.
           </p>
-          {this.state.solution && (
+          {this.state.solved && (
             <Solution params={this.state.params} nPieces={this.state.nPieces} />
           )}
-          {this.state.solution || <BlocksForm onSolve={this.solve} />}
+          {this.state.solved || <BlocksForm onSolve={this.solve} />}
         </div>
       </div>
     );
