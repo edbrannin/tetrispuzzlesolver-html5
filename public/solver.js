@@ -1,5 +1,5 @@
-var board;
-var rows,
+let board;
+let rows,
   cols,
   iblocks,
   oblocks,
@@ -9,15 +9,15 @@ var rows,
   sblocks,
   zblocks,
   nPieces;
-var I = "i",
+const I = "i",
   O = "o",
   T = "t",
   J = "j",
   L = "l",
   S = "s",
   Z = "z";
-var blocks;
-var blocksPtr = 0;
+let blocks;
+let blocksPtr = 0;
 
 this.addEventListener(
   "message",
@@ -25,6 +25,7 @@ this.addEventListener(
     var params = e.data.split(" ");
 
     if (params[0].indexOf("s") === 0) {
+      let i;
       rows = Number(params[1]);
       cols = Number(params[2]);
       iblocks = Number(params[3]);
@@ -37,25 +38,25 @@ this.addEventListener(
       nPieces =
         iblocks + oblocks + tblocks + jblocks + lblocks + sblocks + zblocks;
       blocks = new Array(nPieces);
-      for (var i = 0; i < iblocks; i++) {
+      for (i = 0; i < iblocks; i++) {
         blocks[blocksPtr++] = I;
       }
-      for (var i = 0; i < oblocks; i++) {
+      for (i = 0; i < oblocks; i++) {
         blocks[blocksPtr++] = O;
       }
-      for (var i = 0; i < tblocks; i++) {
+      for (i = 0; i < tblocks; i++) {
         blocks[blocksPtr++] = T;
       }
-      for (var i = 0; i < jblocks; i++) {
+      for (i = 0; i < jblocks; i++) {
         blocks[blocksPtr++] = J;
       }
-      for (var i = 0; i < lblocks; i++) {
+      for (i = 0; i < lblocks; i++) {
         blocks[blocksPtr++] = L;
       }
-      for (var i = 0; i < sblocks; i++) {
+      for (i = 0; i < sblocks; i++) {
         blocks[blocksPtr++] = S;
       }
-      for (var i = 0; i < zblocks; i++) {
+      for (i = 0; i < zblocks; i++) {
         blocks[blocksPtr++] = Z;
       }
       blocksPtr = 0;
@@ -127,6 +128,7 @@ function isStupidConfig() {
 }
 
 function s(p) {
+  let x, y;
   if (Date.now() - t > 20) {
     sendBoard();
     t = Date.now();
@@ -143,8 +145,8 @@ function s(p) {
      #
      #
      */
-    for (var y = 0; y <= rows - 4; y++) {
-      for (var x = 0; x <= cols - 1; x++) {
+    for (y = 0; y <= rows - 4; y++) {
+      for (x = 0; x <= cols - 1; x++) {
         if (
           board[y][x] === 0 &&
           board[y + 1][x] === 0 &&
@@ -169,8 +171,8 @@ function s(p) {
       }
     }
     // ####
-    for (var y = 0; y <= rows - 1; y++) {
-      for (var x = 0; x <= cols - 4; x++) {
+    for (y = 0; y <= rows - 1; y++) {
+      for (x = 0; x <= cols - 4; x++) {
         if (
           board[y][x] === 0 &&
           board[y][x + 1] === 0 &&
@@ -200,8 +202,8 @@ function s(p) {
   }
   if (block === O) {
     //2x2 square block can have only 1 rotation
-    for (var y = 0; y <= rows - 2; y++) {
-      for (var x = 0; x <= cols - 2; x++) {
+    for (y = 0; y <= rows - 2; y++) {
+      for (x = 0; x <= cols - 2; x++) {
         if (
           board[y][x] === 0 &&
           board[y + 1][x] === 0 &&
@@ -236,8 +238,8 @@ function s(p) {
      ###
      _#
      */
-    for (var y = 0; y <= rows - 2; y++) {
-      for (var x = 0; x <= cols - 3; x++) {
+    for (y = 0; y <= rows - 2; y++) {
+      for (x = 0; x <= cols - 3; x++) {
         if (
           board[y][x] === 0 &&
           board[y][x + 1] === 0 &&
@@ -265,8 +267,8 @@ function s(p) {
      ##
      #
      */
-    for (var y = 0; y <= rows - 3; y++) {
-      for (var x = 0; x <= cols - 2; x++) {
+    for (y = 0; y <= rows - 3; y++) {
+      for (x = 0; x <= cols - 2; x++) {
         if (
           board[y][x] === 0 &&
           board[y + 1][x] === 0 &&
@@ -294,8 +296,8 @@ function s(p) {
      ##
      _#
      */
-    for (var y = 0; y <= rows - 3; y++) {
-      for (var x = 0; x <= cols - 2; x++) {
+    for (y = 0; y <= rows - 3; y++) {
+      for (x = 0; x <= cols - 2; x++) {
         if (
           board[y][x + 1] === 0 &&
           board[y + 1][x] === 0 &&
@@ -322,8 +324,8 @@ function s(p) {
      _#
      ###
      */
-    for (var y = 0; y <= rows - 2; y++) {
-      for (var x = 0; x <= cols - 3; x++) {
+    for (y = 0; y <= rows - 2; y++) {
+      for (x = 0; x <= cols - 3; x++) {
         if (
           board[y + 1][x] === 0 &&
           board[y][x + 1] === 0 &&
@@ -358,8 +360,8 @@ function s(p) {
      ###
      __#
      */
-    for (var y = 0; y <= rows - 2; y++) {
-      for (var x = 0; x <= cols - 3; x++) {
+    for (y = 0; y <= rows - 2; y++) {
+      for (x = 0; x <= cols - 3; x++) {
         if (
           board[y][x] === 0 &&
           board[y][x + 1] === 0 &&
@@ -386,8 +388,8 @@ function s(p) {
      #
      ###
      */
-    for (var y = 0; y <= rows - 2; y++) {
-      for (var x = 0; x <= cols - 3; x++) {
+    for (y = 0; y <= rows - 2; y++) {
+      for (x = 0; x <= cols - 3; x++) {
         if (
           board[y + 1][x] === 0 &&
           board[y][x] === 0 &&
@@ -415,8 +417,8 @@ function s(p) {
      #
      #
      */
-    for (var y = 0; y <= rows - 3; y++) {
-      for (var x = 0; x <= cols - 2; x++) {
+    for (y = 0; y <= rows - 3; y++) {
+      for (x = 0; x <= cols - 2; x++) {
         if (
           board[y][x] === 0 &&
           board[y + 1][x] === 0 &&
@@ -444,8 +446,8 @@ function s(p) {
      _#
      ##
      */
-    for (var y = 0; y <= rows - 3; y++) {
-      for (var x = 0; x <= cols - 2; x++) {
+    for (y = 0; y <= rows - 3; y++) {
+      for (x = 0; x <= cols - 2; x++) {
         if (
           board[y][x + 1] === 0 &&
           board[y + 2][x] === 0 &&
@@ -480,8 +482,8 @@ function s(p) {
      ###
      #
      */
-    for (var y = 0; y <= rows - 2; y++) {
-      for (var x = 0; x <= cols - 3; x++) {
+    for (y = 0; y <= rows - 2; y++) {
+      for (x = 0; x <= cols - 3; x++) {
         if (
           board[y][x] === 0 &&
           board[y][x + 1] === 0 &&
@@ -509,8 +511,8 @@ function s(p) {
      #
      ##
      */
-    for (var y = 0; y <= rows - 3; y++) {
-      for (var x = 0; x <= cols - 2; x++) {
+    for (y = 0; y <= rows - 3; y++) {
+      for (x = 0; x <= cols - 2; x++) {
         if (
           board[y][x] === 0 &&
           board[y + 1][x] === 0 &&
@@ -538,8 +540,8 @@ function s(p) {
      _#
      _#
      */
-    for (var y = 0; y <= rows - 3; y++) {
-      for (var x = 0; x <= cols - 2; x++) {
+    for (y = 0; y <= rows - 3; y++) {
+      for (x = 0; x <= cols - 2; x++) {
         if (
           board[y][x + 1] === 0 &&
           board[y][x] === 0 &&
@@ -566,8 +568,8 @@ function s(p) {
      __#
      ###
      */
-    for (var y = 0; y <= rows - 2; y++) {
-      for (var x = 0; x <= cols - 3; x++) {
+    for (y = 0; y <= rows - 2; y++) {
+      for (x = 0; x <= cols - 3; x++) {
         if (
           board[y + 1][x] === 0 &&
           board[y][x + 2] === 0 &&
@@ -603,8 +605,8 @@ function s(p) {
      ##
      _#
      */
-    for (var y = 0; y <= rows - 3; y++) {
-      for (var x = 0; x <= cols - 2; x++) {
+    for (y = 0; y <= rows - 3; y++) {
+      for (x = 0; x <= cols - 2; x++) {
         if (
           board[y][x] === 0 &&
           board[y + 1][x] === 0 &&
@@ -631,8 +633,8 @@ function s(p) {
      _##
      ##
      */
-    for (var y = 0; y <= rows - 2; y++) {
-      for (var x = 0; x <= cols - 3; x++) {
+    for (y = 0; y <= rows - 2; y++) {
+      for (x = 0; x <= cols - 3; x++) {
         if (
           board[y][x + 1] === 0 &&
           board[y][x + 2] === 0 &&
@@ -667,8 +669,8 @@ function s(p) {
      **
      _**
      */
-    for (var y = 0; y <= rows - 2; y++) {
-      for (var x = 0; x <= cols - 3; x++) {
+    for (y = 0; y <= rows - 2; y++) {
+      for (x = 0; x <= cols - 3; x++) {
         if (
           board[y][x] === 0 &&
           board[y][x + 1] === 0 &&
@@ -696,8 +698,8 @@ function s(p) {
      ##
      #
      */
-    for (var y = 0; y <= rows - 3; y++) {
-      for (var x = 0; x <= cols - 2; x++) {
+    for (y = 0; y <= rows - 3; y++) {
+      for (x = 0; x <= cols - 2; x++) {
         if (
           board[y][x + 1] === 0 &&
           board[y + 1][x] === 0 &&
