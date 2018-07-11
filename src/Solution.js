@@ -11,34 +11,40 @@ const getBlockSize = () => {
 };
 
 const getColors = (count) => {
-  var colors=new Array(count+1);
-  colors[0]="#202020";
-  for(var i=0;i<count;i++){
-    const hue = (360*(i/count));
-    const sat = (i%2===0?100:50);
-    colors[i+1]=`hsl(${hue},${sat}%,50%)`;
+  var colors = new Array(count + 1);
+  colors[0] = "#202020";
+  for(var i = 0; i < count; i++){
+    const hue = (360 * (i / count));
+    const sat = (i % 2 === 0 ? 100 : 50);
+    colors[i + 1] = `hsl(${hue},${sat}%,50%)`;
   }
   return colors;
 }
 
 class Solution extends Component {
+  state = {
+    blockSize: getBlockSize(),
+  }
+
   updateCanvas = () => {
-    const { solution, nPieces } = this.props;
-    const blockSize = getBlockSize;
+    const { board, nPieces, rows, cols } = this.props;
+    if (! board) {
+      return;
+    }
+    const blockSize = getBlockSize();
 
     const colors = getColors(nPieces);
 
     // TODO ref
-    var grid=document.getElementById("grid");
-    var cols=Number(solution[2]), rows=Number(solution[1]);
-    grid.width=blockSize*cols;
-    grid.height=blockSize*rows;
-    var c=grid.getContext("2d");
-    for(var y=0;y<rows;y++){
-      for(var x=0;x<cols;x++){
-        var v=Number(solution[3+(y*cols)+x]);
-        c.fillStyle=colors[v];
-        c.fillRect(blockSize*x,blockSize*y,blockSize,blockSize);
+    const grid = document.getElementById("grid");
+    grid.width = blockSize * cols;
+    grid.height = blockSize * rows;
+    const c = grid.getContext("2d");
+    for(var y = 0; y < rows; y++){
+      for(var x = 0; x < cols; x++){
+        const color = board[y][x];
+        c.fillStyle = colors[color];
+        c.fillRect(blockSize * x,blockSize * y,blockSize,blockSize);
       }
     }
   }
@@ -46,14 +52,14 @@ class Solution extends Component {
   componentDidMount() {
     this.updateCanvas();
   }
+
   render() {
     return (
       <canvas
         id="grid"
-        width={0}
-        height={0}
+        width={this.props.cols + this.state.blockSize}
+        height={this.props.rows + this.state.blockSize}
         className={css`
-          display:none;
           margin-bottom:2em;
         `}
       >

@@ -39,9 +39,16 @@ const BlockInput = ({ letter, defaultValue }) => (
 );
 
 class BlocksForm extends Component {
+  state = {
+    canSolve: true,
+  }
+
   render() {
     return (
-      <form id="params" onSubmit={this.solve}>
+      <form
+        id="params"
+        onSubmit={this.solve}
+      >
         <div>
           <div>
             <div>
@@ -69,13 +76,22 @@ class BlocksForm extends Component {
           <BlockInput letter="s" defaultValue={2} />
           <BlockInput letter="z" defaultValue={1} />
         </div>
-        <input type="submit" id="start" value="Solve" />
+        { this.state.canSolve ? (
+          <input
+            type="submit"
+            id="start"
+            value="Solve"
+          />
+        ) : (
+          <p>Impossible to solve</p>
+        )}
       </form>
     );
   }
 
-  solve = () => {
+  solve = (e) => {
     this.props.onSolve();
+    e.preventDefault();
   }
 }
 

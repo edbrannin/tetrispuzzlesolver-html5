@@ -3,6 +3,7 @@ import "./App.css";
 import Solution from "./Solution";
 import BlocksForm from "./BlocksForm";
 import { css } from 'emotion'
+import Solver from './solver';
 
 const getState = () => {
   const rows = Number(document.getElementById("rows").value),
@@ -37,69 +38,63 @@ class App extends Component {
   };
 
   solve = () => {
-    const {
-      rows,
-      cols,
-      iblocks,
-      oblocks,
-      tblocks,
-      jblocks,
-      lblocks,
-      sblocks,
-      zblocks,
-      nPieces
-    } = getState();
-
-    var w = new Worker("solver.js");
-    w.onmessage = function(event) {
-      var params = event.data.split(" ");
-      if (params[0].indexOf("impossible") === 0) {
-        w.terminate();
-        alert("Impossible");
-        return;
-      }
-      if (params[0].indexOf("solved") === 0) {
-        w.terminate();
-        return;
-      }
-      if (params[0].indexOf("grid") === 0) {
-        this.setState({
-          solved: true,
-          params,
-          nPieces
-        });
-      }
-    };
-
-    w.postMessage(
-      `s ${rows} ${cols} ${iblocks} ${oblocks} ${tblocks} ${jblocks} ${lblocks} ${sblocks} ${zblocks}`
-    );
+    const solver = new Solver(getState());
+    const answer = solver.solve();
+    if (answer.impossible) {
+      alert('Impossible');
+      return;
+    }
+    // TODO Intermediate answers
+    this.setState(answer);
   };
+
+  reset = () => {
+    this.setState({
+      solved: false,
+    });
+  }
 
   render() {
     return (
-      <div className={css`
+      <div
+        className={css`
             color: White;
             background-color: black;
             text-align: center;
             height: 100%;
-        `
-        }
+        `}
       >
         <header className="App-heade">
           <h1 className="App-title">Tetris Puzzle Solver</h1>
+          <p>
+            Fills a rectangle with tetraminos.
+            <br />
+            Requires HTML5 Canvas.
+          </p>
         </header>
         <div
           className={css`
-            `
-          }
-          >
-          <p>
-            Fills a rectangle with tetraminos.<br />Requires HTML5 Canvas and Web
-            Workers support.
-          </p>
+          `}
+        >
           {this.state.solved && (
-            <Solution params={this.state.params} nPieces={this.state.nPieces} />
+            <div>
+              <Solution
+                rows={this.state.rows}
+                cols={this.state.cols}
+                board={this.state.board}
+                nPieces={this.state.nPieces}
+              />
+              <p>
+                <button
+                  className={`
+                    position: block,
+                  `}
+                  onClick={this.reset}
+                >
+                  Try Again
+                </button>
+              </p>
+            </div>
           )}
           {this.state.solved || <BlocksForm onSolve={this.solve} />}
         </div>

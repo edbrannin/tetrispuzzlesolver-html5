@@ -10,17 +10,17 @@ class Solver {
   constructor({
     rows,
     cols,
-    iblocks,
-    oblocks,
-    tblocks,
-    jblocks,
-    lblocks,
-    sblocks,
-    zblocks,
+    iblocks = 0,
+    oblocks = 0,
+    tblocks = 0,
+    jblocks = 0,
+    lblocks = 0,
+    sblocks = 0,
+    zblocks = 0,
   }) {
     this.blocksPtr = 0;
-    this.rows = this.rows;
-    this.cols = this.cols;
+    this.rows = rows;
+    this.cols = cols;
     this.nPieces =
       iblocks + oblocks + tblocks + jblocks + lblocks + sblocks + zblocks;
     this.t = Date.now();
@@ -52,26 +52,37 @@ class Solver {
     this.board = new Array(this.rows);
     for (var y = 0; y < this.board.length; y++) {
       this.board[y] = new Array(this.cols);
-      for (var x = 0; x < this.board[0].length; x++) this.board[y][x] = 0;
+      for (var x = 0; x < this.board[0].length; x++) {
+        this.board[y][x] = 0;
+      }
     }
   }
 
   solve() {
-    // old solve()
-    if (this.nPieces * 4 !== this.rows * this.cols) postMessage("impossible");
-    else if (this.s(1)) {
+    if (this.nPieces * 4 !== this.rows * this.cols) {
       //cannot be filled by tetraminos
-      this.sendBoard();
-      postMessage("solved");
-    } else postMessage("impossible");
+      console.log(`this.nPieces * 4: ${this.nPieces * 4}`);
+      console.log(`this.rows * this.cols: ${this.rows} * ${this.cols}: ${this.rows * this.cols}`);
+      return { impossible: true };
+    } else if (this.s(1)) {
+      return {
+        ...this.sendBoard(),
+        nPieces: this.nPieces,
+        solved: true,
+      };
+    } else {
+      console.log('Couldn\'t place all blocks.');
+      return { impossible: true };
+    }
   }
 
   sendBoard() {
     if (this.board) {
-      var s = "grid " + this.board.length + " " + this.board[0].length + " ";
-      for (var y = 0; y < this.board.length; y++)
-        for (var x = 0; x < this.board[0].length; x++) s += this.board[y][x] + " ";
-      postMessage(s);
+      return {
+        rows: this.board.length,
+        cols: this.board[0].length,
+        board: this.board,
+      }
     }
   }
 
@@ -141,10 +152,11 @@ class Solver {
             this.board[y + 1][x] = p;
             this.board[y + 2][x] = p;
             this.board[y + 3][x] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
               }
+            }
             //otherwise, we need to find another place
             this.board[y][x] = 0;
             this.board[y + 1][x] = 0;
@@ -167,10 +179,11 @@ class Solver {
             this.board[y][x + 1] = p;
             this.board[y][x + 2] = p;
             this.board[y][x + 3] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x] = 0;
             this.board[y][x + 1] = 0;
             this.board[y][x + 2] = 0;
@@ -198,10 +211,11 @@ class Solver {
             this.board[y + 1][x] = p;
             this.board[y][x + 1] = p;
             this.board[y + 1][x + 1] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x] = 0;
             this.board[y + 1][x] = 0;
             this.board[y][x + 1] = 0;
@@ -234,10 +248,11 @@ class Solver {
             this.board[y][x + 1] = p;
             this.board[y + 1][x + 1] = p;
             this.board[y][x + 2] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x] = 0;
             this.board[y][x + 1] = 0;
             this.board[y + 1][x + 1] = 0;
@@ -263,10 +278,11 @@ class Solver {
             this.board[y + 1][x] = p;
             this.board[y + 1][x + 1] = p;
             this.board[y + 2][x] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x] = 0;
             this.board[y + 1][x] = 0;
             this.board[y + 1][x + 1] = 0;
@@ -292,10 +308,11 @@ class Solver {
             this.board[y + 1][x] = p;
             this.board[y + 1][x + 1] = p;
             this.board[y + 2][x + 1] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x + 1] = 0;
             this.board[y + 1][x] = 0;
             this.board[y + 1][x + 1] = 0;
@@ -320,10 +337,11 @@ class Solver {
             this.board[y][x + 1] = p;
             this.board[y + 1][x + 1] = p;
             this.board[y + 1][x + 2] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y + 1][x] = 0;
             this.board[y][x + 1] = 0;
             this.board[y + 1][x + 1] = 0;
@@ -356,10 +374,11 @@ class Solver {
             this.board[y][x + 1] = p;
             this.board[y + 1][x + 2] = p;
             this.board[y][x + 2] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x] = 0;
             this.board[y][x + 1] = 0;
             this.board[y + 1][x + 2] = 0;
@@ -384,10 +403,11 @@ class Solver {
             this.board[y][x] = p;
             this.board[y + 1][x + 1] = p;
             this.board[y + 1][x + 2] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y + 1][x] = 0;
             this.board[y][x] = 0;
             this.board[y + 1][x + 1] = 0;
@@ -413,10 +433,11 @@ class Solver {
             this.board[y + 1][x] = p;
             this.board[y][x + 1] = p;
             this.board[y + 2][x] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x] = 0;
             this.board[y + 1][x] = 0;
             this.board[y][x + 1] = 0;
@@ -442,10 +463,11 @@ class Solver {
             this.board[y + 2][x] = p;
             this.board[y + 1][x + 1] = p;
             this.board[y + 2][x + 1] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x + 1] = 0;
             this.board[y + 2][x] = 0;
             this.board[y + 1][x + 1] = 0;
@@ -478,10 +500,11 @@ class Solver {
             this.board[y][x + 1] = p;
             this.board[y + 1][x] = p;
             this.board[y][x + 2] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x] = 0;
             this.board[y][x + 1] = 0;
             this.board[y + 1][x] = 0;
@@ -507,10 +530,11 @@ class Solver {
             this.board[y + 1][x] = p;
             this.board[y + 2][x + 1] = p;
             this.board[y + 2][x] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x] = 0;
             this.board[y + 1][x] = 0;
             this.board[y + 2][x + 1] = 0;
@@ -536,10 +560,11 @@ class Solver {
             this.board[y][x] = p;
             this.board[y + 1][x + 1] = p;
             this.board[y + 2][x + 1] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x + 1] = 0;
             this.board[y][x] = 0;
             this.board[y + 1][x + 1] = 0;
@@ -564,10 +589,11 @@ class Solver {
             this.board[y][x + 2] = p;
             this.board[y + 1][x + 1] = p;
             this.board[y + 1][x + 2] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y + 1][x] = 0;
             this.board[y][x + 2] = 0;
             this.board[y + 1][x + 1] = 0;
@@ -601,10 +627,11 @@ class Solver {
             this.board[y + 1][x] = p;
             this.board[y + 1][x + 1] = p;
             this.board[y + 2][x + 1] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x] = 0;
             this.board[y + 1][x] = 0;
             this.board[y + 1][x + 1] = 0;
@@ -629,10 +656,11 @@ class Solver {
             this.board[y][x + 2] = p;
             this.board[y + 1][x] = p;
             this.board[y + 1][x + 1] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x + 1] = 0;
             this.board[y][x + 2] = 0;
             this.board[y + 1][x] = 0;
@@ -665,10 +693,11 @@ class Solver {
             this.board[y][x + 1] = p;
             this.board[y + 1][x + 1] = p;
             this.board[y + 1][x + 2] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x] = 0;
             this.board[y][x + 1] = 0;
             this.board[y + 1][x + 1] = 0;
@@ -694,10 +723,11 @@ class Solver {
             this.board[y + 1][x] = p;
             this.board[y + 1][x + 1] = p;
             this.board[y + 2][x] = p;
-            if (!this.isStupidConfig())
+            if (!this.isStupidConfig()) {
               if (this.s(p + 1)) {
                 return true; //this is the right place for this block
-              } //otherwise, we need to find another place
+              }
+            } //otherwise, we need to find another place
             this.board[y][x + 1] = 0;
             this.board[y + 1][x] = 0;
             this.board[y + 1][x + 1] = 0;
